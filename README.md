@@ -186,6 +186,7 @@ Todos los errores tienen el mismo formato. Ejemplo de un alquiler con fechas inv
 ## Evidencias
 
 - `postman/`: colección con 34 solicitudes (casos exitosos y de error) y 66 comprobaciones automáticas. Resultado: 0 fallos.
+- `evidencias/`: capturas de las respuestas reales de la API (casos exitosos, 400, 404 y 409), de las bases de datos y de las pruebas, además de la salida completa del Postman CLI (`postman_run_completo.txt`).
 - `sql/bd_alquiler_vehiculos.sql`: esquema y datos de las 3 bases de datos.
 - `docker/init/01_bases_de_datos.sql`: creación de las bases de datos y sus usuarios.
 - `diagrama_microservicios.png` / `.svg`: diagrama de servicios y bases de datos.

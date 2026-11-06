@@ -1,0 +1,235 @@
+No authorization data found. Please use the `postman login` command.
+Refer:https://learning.postman.com/docs/postman-cli/postman-cli-options/#postman-login
+
+Running your collection...
+postman
+
+Eva 3 - Alquiler de vehículos (microservicios)
+
+Folder 1. Clientes (8081)
+Sub-folder Registrar cliente (válido)
+
+  POST http://localhost:8081/api/clientes [201 Created, 430 B, 47 ms]
+  Pass  Responde 201
+  Pass  Devuelve el id y la cabecera Location
+
+Sub-folder Listar clientes
+
+  GET http://localhost:8081/api/clientes [200 OK, 786 B, 36 ms]
+  Pass  Responde 200
+  Pass  Es una lista
+
+Sub-folder Buscar cliente por ID
+
+  GET http://localhost:8081/api/clientes/3 [200 OK, 369 B, 14 ms]
+  Pass  Responde 200
+  Pass  Es el cliente registrado
+
+Sub-folder Actualizar cliente
+
+  PUT http://localhost:8081/api/clientes/3 [200 OK, 369 B, 66 ms]
+  Pass  Responde 200
+  Pass  Cambió el teléfono
+
+Sub-folder ERROR: cliente con datos inválidos
+
+  POST http://localhost:8081/api/clientes [400 Bad Request, 537 B, 5 ms]
+  Pass  Responde 400
+  Pass  Indica el error en el campo dni
+  Pass  Indica el error en el campo nombres
+  Pass  Indica el error en el campo correo
+  Pass  Indica el error en el campo numeroLicencia
+
+Sub-folder ERROR: DNI repetido
+
+  POST http://localhost:8081/api/clientes [409 Conflict, 331 B, 11 ms]
+  Pass  Responde 409
+  Pass  Mensaje: Ya existe un cliente con el DNI
+
+Sub-folder ERROR: cliente inexistente
+
+  GET http://localhost:8081/api/clientes/999999 [404 Not Found, 334 B, 11 ms]
+  Pass  Responde 404
+  Pass  Mensaje: No existe un cliente con id 999999
+
+Sub-folder ERROR: ID que no es número
+
+  GET http://localhost:8081/api/clientes/abc [400 Bad Request, 321 B, 4 ms]
+  Pass  Responde 400
+
+Folder 2. Vehículos (8082)
+Sub-folder Registrar vehículo (válido)
+
+  POST http://localhost:8082/api/vehiculos [201 Created, 373 B, 24 ms]
+  Pass  Responde 201
+  Pass  Queda DISPONIBLE por defecto
+
+Sub-folder Listar vehículos disponibles
+
+  GET http://localhost:8082/api/vehiculos?estado=DISPONIBLE [200 OK, 621 B, 27 ms]
+  Pass  Responde 200
+  Pass  Todos están DISPONIBLES
+
+Sub-folder Buscar vehículo por ID
+
+  GET http://localhost:8082/api/vehiculos/3 [200 OK, 312 B, 14 ms]
+  Pass  Responde 200
+
+Sub-folder Actualizar vehículo
+
+  PUT http://localhost:8082/api/vehiculos/3 [200 OK, 311 B, 44 ms]
+  Pass  Responde 200
+  Pass  Cambió el color
+
+Sub-folder ERROR: vehículo con datos inválidos
+
+  POST http://localhost:8082/api/vehiculos [400 Bad Request, 426 B, 15 ms]
+  Pass  Responde 400
+  Pass  Indica el error en el campo placa
+  Pass  Indica el error en el campo marca
+  Pass  Indica el error en el campo anio
+
+Sub-folder ERROR: estado que no existe
+
+  GET http://localhost:8082/api/vehiculos?estado=VOLANDO [400 Bad Request, 326 B, 8 ms]
+  Pass  Responde 400
+
+Sub-folder ERROR: vehículo inexistente
+
+  GET http://localhost:8082/api/vehiculos/999999 [404 Not Found, 337 B, 14 ms]
+  Pass  Responde 404
+
+Folder 3. Alquileres (8083)
+Sub-folder Registrar alquiler (válido)
+
+  POST http://localhost:8083/api/alquileres [201 Created, 426 B, 41 ms]
+  Pass  Responde 201
+  Pass  Calcula 3 días
+  Pass  Importe = 3 x 150 = 450
+  Pass  Nace ACTIVO
+
+Sub-folder ERROR: fecha fin antes que la de inicio
+
+  POST http://localhost:8083/api/alquileres [400 Bad Request, 381 B, 4 ms]
+  Pass  Responde 400
+  Pass  Indica el error en el campo rangoDeFechasValido
+
+Sub-folder ERROR: tarifa negativa
+
+  POST http://localhost:8083/api/alquileres [400 Bad Request, 357 B, 10 ms]
+  Pass  Responde 400
+  Pass  Indica el error en el campo tarifaDiaria
+
+Sub-folder ERROR: fecha de inicio en el pasado
+
+  POST http://localhost:8083/api/alquileres [400 Bad Request, 364 B, 7 ms]
+  Pass  Responde 400
+  Pass  Indica el error en el campo fechaInicio
+
+Sub-folder ERROR: fecha con formato incorrecto
+
+  POST http://localhost:8083/api/alquileres [400 Bad Request, 357 B, 10 ms]
+  Pass  Responde 400
+
+Sub-folder ERROR: faltan datos obligatorios
+
+  POST http://localhost:8083/api/alquileres [400 Bad Request, 480 B, 6 ms]
+  Pass  Responde 400
+  Pass  Indica el error en el campo idCliente
+  Pass  Indica el error en el campo idVehiculo
+  Pass  Indica el error en el campo fechaInicio
+  Pass  Indica el error en el campo fechaFin
+
+Sub-folder ERROR: cliente que no existe
+
+  POST http://localhost:8083/api/alquileres [404 Not Found, 329 B, 22 ms]
+  Pass  Responde 404
+  Pass  Mensaje: No existe un cliente con id 999999
+
+Sub-folder ERROR: vehículo ya alquilado en esas fechas
+
+  POST http://localhost:8083/api/alquileres [409 Conflict, 356 B, 30 ms]
+  Pass  Responde 409
+  Pass  Mensaje: ya tiene un alquiler activo
+
+Sub-folder Listar alquileres
+
+  GET http://localhost:8083/api/alquileres [200 OK, 786 B, 46 ms]
+  Pass  Responde 200
+
+Sub-folder Listar alquileres de un cliente
+
+  GET http://localhost:8083/api/alquileres?idCliente=3 [200 OK, 366 B, 35 ms]
+  Pass  Responde 200
+  Pass  Todos son del cliente
+
+Sub-folder Buscar alquiler por ID
+
+  GET http://localhost:8083/api/alquileres/4 [200 OK, 364 B, 21 ms]
+  Pass  Responde 200
+
+Sub-folder Actualizar alquiler (más días)
+
+  PUT http://localhost:8083/api/alquileres/4 [200 OK, 363 B, 50 ms]
+  Pass  Responde 200
+  Pass  Recalcula: 5 días x 150 = 750
+
+Sub-folder Finalizar alquiler (devolución)
+
+  PATCH http://localhost:8083/api/alquileres/4/estado [200 OK, 368 B, 23 ms]
+  Pass  Responde 200
+  Pass  Queda FINALIZADO
+
+Sub-folder ERROR: modificar un alquiler finalizado
+
+  PUT http://localhost:8083/api/alquileres/4 [409 Conflict, 360 B, 11 ms]
+  Pass  Responde 409
+  Pass  Mensaje: Solo se puede modificar un alquiler ACTIVO
+
+Sub-folder ERROR: alquiler inexistente
+
+  GET http://localhost:8083/api/alquileres/999999 [404 Not Found, 337 B, 13 ms]
+  Pass  Responde 404
+
+Folder 4. Eliminar
+Sub-folder Registrar alquiler temporal
+
+  POST http://localhost:8083/api/alquileres [201 Created, 426 B, 38 ms]
+  Pass  Responde 201
+
+Sub-folder Eliminar alquiler temporal
+
+  DELETE http://localhost:8083/api/alquileres/5 [204 No Content, 112 B, 30 ms]
+  Pass  Responde 204
+
+Sub-folder Comprobar que se eliminó
+
+  GET http://localhost:8083/api/alquileres/5 [404 Not Found, 327 B, 10 ms]
+  Pass  Responde 404
+
+Sub-folder ERROR: eliminar cliente inexistente
+
+  DELETE http://localhost:8081/api/clientes/999999 [404 Not Found, 334 B, 10 ms]
+  Pass  Responde 404
+
+---------------------------------------------------------------------
+|                         |           executed |             failed |
+--------------------------+--------------------+---------------------
+|              iterations |                  1 |                  0 |
+--------------------------+--------------------+---------------------
+|                requests |                 34 |                  0 |
+--------------------------+--------------------+---------------------
+|            test-scripts |                 34 |                  0 |
+--------------------------+--------------------+---------------------
+|      prerequest-scripts |                  3 |                  0 |
+--------------------------+--------------------+---------------------
+|              assertions |                 66 |                  0 |
+---------------------------------------------------------------------
+| total run duration: 3.6 s                                         |
+---------------------------------------------------------------------
+| total data received: 7.65 KB (approx)                             |
+---------------------------------------------------------------------
+| average response time: 22 ms [min: 4 ms, max: 66 ms, s.d.: 15 ms] |
+---------------------------------------------------------------------
+Postman credentials are required for publishing run details to Postman cloud.
+Please specify it by using the `postman login` command

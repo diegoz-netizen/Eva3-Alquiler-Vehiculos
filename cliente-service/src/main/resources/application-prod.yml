@@ -1,0 +1,15 @@
+# Perfil prod: los datos de conexión llegan por variables de entorno (nunca escritos aquí)
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate   # en producción no se tocan las tablas: solo se comprueba que coincidan
+    show-sql: false
+
+logging:
+  level:
+    root: WARN
+    pe.edu.tecsup: INFO

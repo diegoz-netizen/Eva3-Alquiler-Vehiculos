@@ -1,0 +1,30 @@
+# MySQL de la Evaluación 03 (alquiler de vehículos) en Docker.
+#   Encender:  docker compose up -d --wait   (o: eva3 on)
+#   Apagar:    docker compose stop           (o: eva3 off; los datos se quedan)
+#   De cero:   docker compose down -v        y luego up (vuelve a crear las 3 BD)
+# Un solo servidor MySQL con 3 bases de datos separadas, una por microservicio.
+# La clave de root va en .env (no se sube). Puerto 3308 para no chocar con XAMPP (3306) ni la Eva 2 (3307).
+
+name: alquiler-eva3
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: alquiler-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Falta MYSQL_ROOT_PASSWORD en .env}
+      TZ: America/Lima
+    ports:
+      - "${PUERTO:-3308}:3306"
+    volumes:
+      - alquiler_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  alquiler_data:

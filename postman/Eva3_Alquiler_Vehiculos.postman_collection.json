@@ -1,0 +1,1040 @@
+{
+  "info": {
+    "_postman_id": "2d061be5-b1f8-4c71-a6e2-f7890afb0cb3",
+    "name": "Eva 3 - Alquiler de vehículos (microservicios)",
+    "description": "Pruebas de cliente-service (8081), vehiculo-service (8082) y alquiler-service (8083).\nCorrer en orden: cada carpeta usa los ids que guarda la anterior.\nLas solicitudes que empiezan con ERROR fallan a propósito (400, 404 o 409) y sus tests lo comprueban.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Clientes (8081)",
+      "item": [
+        {
+          "name": "Registrar cliente (válido)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{clienteUrl}}/api/clientes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dni\": \"{{dni}}\",\n  \"nombres\": \"Diego\",\n  \"apellidos\": \"Panez Rondinel\",\n  \"correo\": \"{{correo}}\",\n  \"telefono\": \"987654321\",\n  \"numeroLicencia\": \"{{licencia}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Datos únicos en cada ejecución para que la colección se pueda correr varias veces",
+                  "const n = () => Math.floor(Math.random() * 10);",
+                  "let dni = \"\"; for (let i = 0; i < 8; i++) dni += n();",
+                  "let lic = \"Q\"; for (let i = 0; i < 8; i++) lic += n();",
+                  "pm.collectionVariables.set(\"dni\", dni);",
+                  "pm.collectionVariables.set(\"licencia\", lic);",
+                  "pm.collectionVariables.set(\"correo\", \"cliente\" + Date.now() + \"@correo.com\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+                  "const c = pm.response.json();",
+                  "pm.collectionVariables.set(\"idCliente\", c.id);",
+                  "pm.test(\"Devuelve el id y la cabecera Location\", () => { pm.expect(c.id).to.be.a(\"number\"); pm.response.to.have.header(\"Location\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar clientes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{clienteUrl}}/api/clientes"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es una lista\", () => pm.expect(pm.response.json()).to.be.an(\"array\").that.is.not.empty);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar cliente por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{clienteUrl}}/api/clientes/{{idCliente}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es el cliente registrado\", () => pm.expect(pm.response.json().dni).to.eql(pm.collectionVariables.get(\"dni\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar cliente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{clienteUrl}}/api/clientes/{{idCliente}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dni\": \"{{dni}}\",\n  \"nombres\": \"Diego\",\n  \"apellidos\": \"Panez Rondinel\",\n  \"correo\": \"{{correo}}\",\n  \"telefono\": \"912345678\",\n  \"numeroLicencia\": \"{{licencia}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Cambió el teléfono\", () => pm.expect(pm.response.json().telefono).to.eql(\"912345678\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: cliente con datos inválidos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{clienteUrl}}/api/clientes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dni\": \"123\",\n  \"nombres\": \"\",\n  \"apellidos\": \"Rojas\",\n  \"correo\": \"no-es-correo\",\n  \"numeroLicencia\": \"123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Indica el error en el campo dni\", () => pm.expect(pm.response.json().campos).to.have.property(\"dni\"));",
+                  "pm.test(\"Indica el error en el campo nombres\", () => pm.expect(pm.response.json().campos).to.have.property(\"nombres\"));",
+                  "pm.test(\"Indica el error en el campo correo\", () => pm.expect(pm.response.json().campos).to.have.property(\"correo\"));",
+                  "pm.test(\"Indica el error en el campo numeroLicencia\", () => pm.expect(pm.response.json().campos).to.have.property(\"numeroLicencia\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: DNI repetido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{clienteUrl}}/api/clientes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dni\": \"{{dni}}\",\n  \"nombres\": \"Diego\",\n  \"apellidos\": \"Panez Rondinel\",\n  \"correo\": \"otro{{$timestamp}}@correo.com\",\n  \"telefono\": \"987654321\",\n  \"numeroLicencia\": \"Z99999999\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Mensaje: Ya existe un cliente con el DNI\", () => pm.expect(pm.response.json().mensaje).to.include(\"Ya existe un cliente con el DNI\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: cliente inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{clienteUrl}}/api/clientes/999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Mensaje: No existe un cliente con id 999999\", () => pm.expect(pm.response.json().mensaje).to.include(\"No existe un cliente con id 999999\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: ID que no es número",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{clienteUrl}}/api/clientes/abc"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Vehículos (8082)",
+      "item": [
+        {
+          "name": "Registrar vehículo (válido)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{vehiculoUrl}}/api/vehiculos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"{{placa}}\",\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Yaris\",\n  \"anio\": 2022,\n  \"color\": \"Plata\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Placa distinta en cada ejecución (formato ABC-123)",
+                  "const letras = \"ABCDEFGHJKLMNPRSTUVWXYZ\";",
+                  "let p = \"\"; for (let i = 0; i < 3; i++) p += letras[Math.floor(Math.random() * letras.length)];",
+                  "p += \"-\" + String(Math.floor(Math.random() * 900) + 100);",
+                  "pm.collectionVariables.set(\"placa\", p);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+                  "const v = pm.response.json();",
+                  "pm.collectionVariables.set(\"idVehiculo\", v.id);",
+                  "pm.test(\"Queda DISPONIBLE por defecto\", () => pm.expect(v.estado).to.eql(\"DISPONIBLE\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar vehículos disponibles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{vehiculoUrl}}/api/vehiculos?estado=DISPONIBLE"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Todos están DISPONIBLES\", () => pm.response.json().forEach(v => pm.expect(v.estado).to.eql(\"DISPONIBLE\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar vehículo por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{vehiculoUrl}}/api/vehiculos/{{idVehiculo}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar vehículo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{vehiculoUrl}}/api/vehiculos/{{idVehiculo}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"{{placa}}\",\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Yaris\",\n  \"anio\": 2022,\n  \"color\": \"Rojo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Cambió el color\", () => pm.expect(pm.response.json().color).to.eql(\"Rojo\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: vehículo con datos inválidos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{vehiculoUrl}}/api/vehiculos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"1234\",\n  \"marca\": \"\",\n  \"modelo\": \"Corolla\",\n  \"anio\": 1980\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Indica el error en el campo placa\", () => pm.expect(pm.response.json().campos).to.have.property(\"placa\"));",
+                  "pm.test(\"Indica el error en el campo marca\", () => pm.expect(pm.response.json().campos).to.have.property(\"marca\"));",
+                  "pm.test(\"Indica el error en el campo anio\", () => pm.expect(pm.response.json().campos).to.have.property(\"anio\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: estado que no existe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{vehiculoUrl}}/api/vehiculos?estado=VOLANDO"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: vehículo inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{vehiculoUrl}}/api/vehiculos/999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Alquileres (8083)",
+      "item": [
+        {
+          "name": "Registrar alquiler (válido)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{alquilerUrl}}/api/alquileres",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCliente\": {{idCliente}},\n  \"idVehiculo\": {{idVehiculo}},\n  \"fechaInicio\": \"{{manana}}\",\n  \"fechaFin\": \"{{en4dias}}\",\n  \"tarifaDiaria\": 150.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Fechas relativas a hoy, así la colección siempre es válida",
+                  "const f = d => { const x = new Date(); x.setDate(x.getDate() + d); return x.toISOString().slice(0, 10); };",
+                  "pm.collectionVariables.set(\"manana\", f(1));",
+                  "pm.collectionVariables.set(\"en4dias\", f(4));",
+                  "pm.collectionVariables.set(\"en6dias\", f(6));",
+                  "pm.collectionVariables.set(\"ayer\", f(-1));",
+                  "pm.collectionVariables.set(\"en30dias\", f(30));",
+                  "pm.collectionVariables.set(\"en32dias\", f(32));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+                  "const a = pm.response.json();",
+                  "pm.collectionVariables.set(\"idAlquiler\", a.id);",
+                  "pm.test(\"Calcula 3 días\", () => pm.expect(a.dias).to.eql(3));",
+                  "pm.test(\"Importe = 3 x 150 = 450\", () => pm.expect(Number(a.importeEstimado)).to.eql(450));",
+                  "pm.test(\"Nace ACTIVO\", () => pm.expect(a.estado).to.eql(\"ACTIVO\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: fecha fin antes que la de inicio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{alquilerUrl}}/api/alquileres",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCliente\": {{idCliente}},\n  \"idVehiculo\": {{idVehiculo}},\n  \"fechaInicio\": \"{{en4dias}}\",\n  \"fechaFin\": \"{{manana}}\",\n  \"tarifaDiaria\": 150.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Indica el error en el campo rangoDeFechasValido\", () => pm.expect(pm.response.json().campos).to.have.property(\"rangoDeFechasValido\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: tarifa negativa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{alquilerUrl}}/api/alquileres",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCliente\": {{idCliente}},\n  \"idVehiculo\": {{idVehiculo}},\n  \"fechaInicio\": \"{{manana}}\",\n  \"fechaFin\": \"{{en4dias}}\",\n  \"tarifaDiaria\": -50\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Indica el error en el campo tarifaDiaria\", () => pm.expect(pm.response.json().campos).to.have.property(\"tarifaDiaria\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: fecha de inicio en el pasado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{alquilerUrl}}/api/alquileres",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCliente\": {{idCliente}},\n  \"idVehiculo\": {{idVehiculo}},\n  \"fechaInicio\": \"{{ayer}}\",\n  \"fechaFin\": \"{{en4dias}}\",\n  \"tarifaDiaria\": 150.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Indica el error en el campo fechaInicio\", () => pm.expect(pm.response.json().campos).to.have.property(\"fechaInicio\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: fecha con formato incorrecto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{alquilerUrl}}/api/alquileres",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCliente\": {{idCliente}},\n  \"idVehiculo\": {{idVehiculo}},\n  \"fechaInicio\": \"2026-13-45\",\n  \"fechaFin\": \"{{en4dias}}\",\n  \"tarifaDiaria\": 150.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: faltan datos obligatorios",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{alquilerUrl}}/api/alquileres",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tarifaDiaria\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Indica el error en el campo idCliente\", () => pm.expect(pm.response.json().campos).to.have.property(\"idCliente\"));",
+                  "pm.test(\"Indica el error en el campo idVehiculo\", () => pm.expect(pm.response.json().campos).to.have.property(\"idVehiculo\"));",
+                  "pm.test(\"Indica el error en el campo fechaInicio\", () => pm.expect(pm.response.json().campos).to.have.property(\"fechaInicio\"));",
+                  "pm.test(\"Indica el error en el campo fechaFin\", () => pm.expect(pm.response.json().campos).to.have.property(\"fechaFin\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: cliente que no existe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{alquilerUrl}}/api/alquileres",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCliente\": 999999,\n  \"idVehiculo\": {{idVehiculo}},\n  \"fechaInicio\": \"{{manana}}\",\n  \"fechaFin\": \"{{en4dias}}\",\n  \"tarifaDiaria\": 150.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Mensaje: No existe un cliente con id 999999\", () => pm.expect(pm.response.json().mensaje).to.include(\"No existe un cliente con id 999999\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: vehículo ya alquilado en esas fechas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{alquilerUrl}}/api/alquileres",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCliente\": {{idCliente}},\n  \"idVehiculo\": {{idVehiculo}},\n  \"fechaInicio\": \"{{manana}}\",\n  \"fechaFin\": \"{{en4dias}}\",\n  \"tarifaDiaria\": 150.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Mensaje: ya tiene un alquiler activo\", () => pm.expect(pm.response.json().mensaje).to.include(\"ya tiene un alquiler activo\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar alquileres",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{alquilerUrl}}/api/alquileres"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar alquileres de un cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{alquilerUrl}}/api/alquileres?idCliente={{idCliente}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Todos son del cliente\", () => pm.response.json().forEach(a => pm.expect(a.idCliente).to.eql(Number(pm.collectionVariables.get(\"idCliente\")))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar alquiler por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{alquilerUrl}}/api/alquileres/{{idAlquiler}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar alquiler (más días)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{alquilerUrl}}/api/alquileres/{{idAlquiler}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCliente\": {{idCliente}},\n  \"idVehiculo\": {{idVehiculo}},\n  \"fechaInicio\": \"{{manana}}\",\n  \"fechaFin\": \"{{en6dias}}\",\n  \"tarifaDiaria\": 150.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "const a = pm.response.json();",
+                  "pm.test(\"Recalcula: 5 días x 150 = 750\", () => { pm.expect(a.dias).to.eql(5); pm.expect(Number(a.importeEstimado)).to.eql(750); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finalizar alquiler (devolución)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{alquilerUrl}}/api/alquileres/{{idAlquiler}}/estado",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"FINALIZADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Queda FINALIZADO\", () => pm.expect(pm.response.json().estado).to.eql(\"FINALIZADO\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: modificar un alquiler finalizado",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{alquilerUrl}}/api/alquileres/{{idAlquiler}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCliente\": {{idCliente}},\n  \"idVehiculo\": {{idVehiculo}},\n  \"fechaInicio\": \"{{manana}}\",\n  \"fechaFin\": \"{{en4dias}}\",\n  \"tarifaDiaria\": 150.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Mensaje: Solo se puede modificar un alquiler ACTIVO\", () => pm.expect(pm.response.json().mensaje).to.include(\"Solo se puede modificar un alquiler ACTIVO\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: alquiler inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{alquilerUrl}}/api/alquileres/999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Eliminar",
+      "item": [
+        {
+          "name": "Registrar alquiler temporal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{alquilerUrl}}/api/alquileres",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCliente\": {{idCliente}},\n  \"idVehiculo\": {{idVehiculo}},\n  \"fechaInicio\": \"{{en30dias}}\",\n  \"fechaFin\": \"{{en32dias}}\",\n  \"tarifaDiaria\": 150.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"idAlquilerTemporal\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar alquiler temporal",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{alquilerUrl}}/api/alquileres/{{idAlquilerTemporal}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Comprobar que se eliminó",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{alquilerUrl}}/api/alquileres/{{idAlquilerTemporal}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ERROR: eliminar cliente inexistente",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{clienteUrl}}/api/clientes/999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "clienteUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "vehiculoUrl",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "alquilerUrl",
+      "value": "http://localhost:8083"
+    }
+  ]
+}

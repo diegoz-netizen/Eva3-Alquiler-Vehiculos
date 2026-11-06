@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+  <rect width="900" height="560" fill="#ffffff"/>
+
+  <text x="450" y="34" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">Sistema de alquiler de vehículos: microservicios</text>
+
+  <!-- Cliente HTTP -->
+  <rect x="350" y="56" width="200" height="46" rx="8" fill="#f1f5f9" stroke="#64748b"/>
+  <text x="450" y="85" text-anchor="middle" font-size="15" fill="#0f172a">Postman / cliente HTTP</text>
+
+  <line x1="400" y1="102" x2="160" y2="160" stroke="#475569" stroke-width="1.6" marker-end="url(#flecha)"/>
+  <line x1="450" y1="102" x2="450" y2="160" stroke="#475569" stroke-width="1.6" marker-end="url(#flecha)"/>
+  <line x1="500" y1="102" x2="740" y2="160" stroke="#475569" stroke-width="1.6" marker-end="url(#flecha)"/>
+
+  <!-- Servicios -->
+  <g>
+    <rect x="40" y="162" width="240" height="150" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.6"/>
+    <text x="160" y="190" text-anchor="middle" font-size="17" font-weight="700" fill="#075985">cliente-service</text>
+    <text x="160" y="210" text-anchor="middle" font-size="13" fill="#075985">puerto 8081 · /api/clientes</text>
+    <text x="60" y="240" font-size="13" fill="#0f172a">• CRUD de clientes</text>
+    <text x="60" y="260" font-size="13" fill="#0f172a">• DNI, correo y licencia únicos</text>
+    <text x="60" y="280" font-size="13" fill="#0f172a">• Valida formatos (DTO)</text>
+  </g>
+  <g>
+    <rect x="330" y="162" width="240" height="150" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.6"/>
+    <text x="450" y="190" text-anchor="middle" font-size="17" font-weight="700" fill="#5b21b6">vehiculo-service</text>
+    <text x="450" y="210" text-anchor="middle" font-size="13" fill="#5b21b6">puerto 8082 · /api/vehiculos</text>
+    <text x="350" y="240" font-size="13" fill="#0f172a">• CRUD de vehículos</text>
+    <text x="350" y="260" font-size="13" fill="#0f172a">• Placa única (ABC-123)</text>
+    <text x="350" y="280" font-size="13" fill="#0f172a">• Estado: DISPONIBLE, ...</text>
+  </g>
+  <g>
+    <rect x="620" y="162" width="240" height="150" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1.6"/>
+    <text x="740" y="190" text-anchor="middle" font-size="17" font-weight="700" fill="#166534">alquiler-service</text>
+    <text x="740" y="210" text-anchor="middle" font-size="13" fill="#166534">puerto 8083 · /api/alquileres</text>
+    <text x="640" y="240" font-size="13" fill="#0f172a">• CRUD + finalizar/cancelar</text>
+    <text x="640" y="260" font-size="13" fill="#0f172a">• Valida fechas y tarifa ≥ 0</text>
+    <text x="640" y="280" font-size="13" fill="#0f172a">• Importe = días × tarifa</text>
+    <text x="640" y="300" font-size="13" fill="#0f172a">• Evita cruces de fechas</text>
+  </g>
+
+  <!-- Llamadas entre servicios -->
+  <path d="M660,312 C640,360 260,360 230,316" fill="none" stroke="#16a34a" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#flecha)"/>
+  <path d="M690,312 C675,340 525,340 510,316" fill="none" stroke="#16a34a" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#flecha)"/>
+  <rect x="215" y="370" width="470" height="22" fill="#ffffff"/>
+  <text x="450" y="386" text-anchor="middle" font-size="13" fill="#166534">alquiler-service pregunta por HTTP: ¿existe el cliente? ¿el vehículo está DISPONIBLE?</text>
+
+  <!-- Bases de datos -->
+  <g>
+    <line x1="160" y1="312" x2="160" y2="408" stroke="#475569" stroke-width="1.6" marker-end="url(#flecha)"/>
+    <line x1="450" y1="312" x2="450" y2="408" stroke="#475569" stroke-width="1.6" marker-end="url(#flecha)"/>
+    <line x1="740" y1="312" x2="740" y2="408" stroke="#475569" stroke-width="1.6" marker-end="url(#flecha)"/>
+  </g>
+  <g fill="#fef3c7" stroke="#d97706" stroke-width="1.6">
+    <path d="M90,420 v70 a70,14 0 0,0 140,0 v-70"/>
+    <ellipse cx="160" cy="420" rx="70" ry="14"/>
+    <path d="M380,420 v70 a70,14 0 0,0 140,0 v-70"/>
+    <ellipse cx="450" cy="420" rx="70" ry="14"/>
+    <path d="M670,420 v70 a70,14 0 0,0 140,0 v-70"/>
+    <ellipse cx="740" cy="420" rx="70" ry="14"/>
+  </g>
+  <text x="160" y="460" text-anchor="middle" font-size="15" font-weight="700" fill="#92400e">bd_cliente</text>
+  <text x="160" y="480" text-anchor="middle" font-size="12" fill="#92400e">tabla clientes</text>
+  <text x="450" y="460" text-anchor="middle" font-size="15" font-weight="700" fill="#92400e">bd_vehiculo</text>
+  <text x="450" y="480" text-anchor="middle" font-size="12" fill="#92400e">tabla vehiculos</text>
+  <text x="740" y="460" text-anchor="middle" font-size="15" font-weight="700" fill="#92400e">bd_alquiler</text>
+  <text x="740" y="480" text-anchor="middle" font-size="12" fill="#92400e">alquileres (idCliente, idVehiculo)</text>
+
+  <text x="450" y="540" text-anchor="middle" font-size="13" fill="#475569">MySQL 8.4 en Docker (puerto 3308) · cada servicio tiene su propio usuario y solo accede a su base de datos</text>
+</svg>

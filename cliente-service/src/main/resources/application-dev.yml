@@ -1,0 +1,14 @@
+# Perfil dev: MySQL local en Docker (puerto 3308). Credenciales solo de desarrollo, no son reales.
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3308/bd_cliente?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=America/Lima
+    username: cliente_user
+    password: cliente_dev
+  jpa:
+    hibernate:
+      ddl-auto: update   # crea o ajusta las tablas a partir de las entidades
+    show-sql: true
+
+logging:
+  level:
+    pe.edu.tecsup: DEBUG

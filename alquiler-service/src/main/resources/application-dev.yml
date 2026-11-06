@@ -1,0 +1,21 @@
+# Perfil dev: MySQL local en Docker (puerto 3308). Credenciales solo de desarrollo, no son reales.
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3308/bd_alquiler?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=America/Lima
+    username: alquiler_user
+    password: alquiler_dev
+  jpa:
+    hibernate:
+      ddl-auto: update   # crea o ajusta las tablas a partir de las entidades
+    show-sql: true
+
+logging:
+  level:
+    pe.edu.tecsup: DEBUG
+
+# Dónde están los otros microservicios en la PC
+servicios:
+  cliente:
+    url: http://localhost:8081
+  vehiculo:
+    url: http://localhost:8082

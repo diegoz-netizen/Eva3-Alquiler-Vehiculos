@@ -1,0 +1,8 @@
+# Clave de root de MySQL local
+docker/.env
+
+# Compilados e IDE
+target/
+.idea/
+*.iml
+.vscode/

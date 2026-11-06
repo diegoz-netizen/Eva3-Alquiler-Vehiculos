@@ -1,0 +1,12 @@
+# Configuración común a todos los ambientes
+server:
+  port: 8082
+
+spring:
+  application:
+    name: vehiculo-service
+  profiles:
+    # Perfil por defecto: dev. En producción se cambia con SPRING_PROFILES_ACTIVE=prod
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  jpa:
+    open-in-view: false

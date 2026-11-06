@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  POM agregador: solo agrupa los 3 microservicios para abrirlos juntos en el IDE
+  y compilarlos con un solo comando. No es un padre: cada servicio sigue siendo
+  independiente, con su propio pom.xml, puerto y base de datos.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>pe.edu.tecsup</groupId>
+    <artifactId>alquiler-vehiculos</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>alquiler-vehiculos</name>
+    <description>Evaluación 03: microservicios de alquiler de vehículos</description>
+
+    <modules>
+        <module>cliente-service</module>
+        <module>vehiculo-service</module>
+        <module>alquiler-service</module>
+    </modules>
+</project>

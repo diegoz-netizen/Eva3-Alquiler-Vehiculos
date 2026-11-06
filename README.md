@@ -57,7 +57,7 @@ eva3 on
 
 Si no tienes el comando `eva3`, usa `docker compose up -d --wait` dentro de la carpeta `docker/`. Antes copia `docker/.env.example` como `docker/.env` y pon una clave de root. La primera vez se crean las 3 bases de datos y sus usuarios (`docker/init/01_bases_de_datos.sql`). Las tablas las crea Hibernate al arrancar cada servicio.
 
-**2. Levantar los 3 servicios.** En IntelliJ: abre cada carpeta `*-service` y ejecuta su clase `*ServiceApplication` con SDK 21. Desde la terminal, uno por ventana:
+**2. Levantar los 3 servicios.** En IntelliJ abre la carpeta raíz: el `pom.xml` de la raíz agrupa los 3 servicios, así que se importan juntos. Configura el SDK 21 y ejecuta cada clase `*ServiceApplication`. Desde la terminal, uno por ventana:
 
 ```bash
 cd cliente-service && ./mvnw spring-boot:run
